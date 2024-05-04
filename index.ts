@@ -1,4 +1,4 @@
-import express, {Express, Request, Response} from "express";
+import express, {Request, Response} from "express";
 // @ts-ignore
 import dotenv from "dotenv";
 

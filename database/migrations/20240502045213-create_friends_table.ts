@@ -17,11 +17,11 @@ module.exports = {
                 autoIncrement: true,
                 type: DataTypes.INTEGER
             },
-            source_id: {
+            sourceId: {
                 allowNull: false,
                 type: DataTypes.INTEGER
             },
-            target_id: {
+            targetId: {
                 allowNull: false,
                 type: DataTypes.INTEGER
             },
@@ -30,7 +30,7 @@ module.exports = {
                 type: DataTypes.SMALLINT,
                 comment: "0: Waiting, 1: Accepted, 2: Canceled"
             },
-            created_at: {
+            createdAt: {
                 allowNull: false,
                 type: DataTypes.DATE,
                 defaultValue: Sequelize.literal("CURRENT_TIMESTAMP")
@@ -38,7 +38,7 @@ module.exports = {
         })
 
         await queryInterface.addConstraint('friends', {
-            fields: ['source_id'],
+            fields: ['sourceId'],
             type: "foreign key",
             references: {
                 table: "users",
@@ -49,7 +49,7 @@ module.exports = {
         })
 
         await queryInterface.addConstraint('friends', {
-            fields: ['target_id'],
+            fields: ['targetId'],
             type: "foreign key",
             references: {
                 table: "users",

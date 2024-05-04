@@ -10,7 +10,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "migrate": "tsc && sequelize-cli db:migrate",
     "migrate:undo": "tsc && sequelize-cli db:migrate:undo",
-    "migration:generate": "sequelize-cli migration:generate --name"
+    "migrate:undo:all": "sequelize-cli db:migrate:undo:all",
+    "migration:generate": "sequelize-cli migration:generate --name",
+    "seed:generate": "sequelize-cli seed:generate --name",
+    "seed:all": "tsc && sequelize-cli db:seed:all",
+    "seed": "tsc && sequelize-cli db:seed --seed"
   },
   "author": "Thanh Dong",
   "license": "ISC",
@@ -24,6 +28,7 @@
     "ts-node-dev": "^2.0.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.4.1",
     "@types/express": "^4.17.21",
     "@types/node": "^20.12.7",
     "ts-node": "^10.9.2",

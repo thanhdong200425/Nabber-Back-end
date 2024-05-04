@@ -26,15 +26,15 @@ module.exports = {
                     autoIncrement: true,
                     type: sequelize_1.DataTypes.INTEGER
                 },
-                source_id: {
+                sourceId: {
                     allowNull: false,
                     type: sequelize_1.DataTypes.INTEGER
                 },
-                target_id: {
+                targetId: {
                     allowNull: false,
                     type: sequelize_1.DataTypes.INTEGER
                 },
-                send_status: {
+                sendStatus: {
                     allowNull: false,
                     type: sequelize_1.DataTypes.SMALLINT,
                     comment: "0: Waiting, 1: Accepted, 2: Unsent"
@@ -43,18 +43,18 @@ module.exports = {
                     allowNull: false,
                     type: sequelize_1.DataTypes.TEXT
                 },
-                created_at: {
+                createdAt: {
                     allowNull: false,
                     type: sequelize_1.DataTypes.DATE,
                     defaultValue: Sequelize.literal("CURRENT_TIMESTAMP")
                 },
-                updated_at: {
+                updatedAt: {
                     allowNull: true,
                     type: sequelize_1.DataTypes.DATE
                 }
             });
             yield queryInterface.addConstraint("messages", {
-                fields: ["source_id"],
+                fields: ["sourceId"],
                 type: "foreign key",
                 references: {
                     table: "users",
@@ -64,7 +64,7 @@ module.exports = {
                 onUpdate: "cascade"
             });
             yield queryInterface.addConstraint("messages", {
-                fields: ["target_id"],
+                fields: ["targetId"],
                 type: "foreign key",
                 references: {
                     table: "users",

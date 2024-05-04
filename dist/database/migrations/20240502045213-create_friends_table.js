@@ -26,11 +26,11 @@ module.exports = {
                     autoIncrement: true,
                     type: sequelize_1.DataTypes.INTEGER
                 },
-                source_id: {
+                sourceId: {
                     allowNull: false,
                     type: sequelize_1.DataTypes.INTEGER
                 },
-                target_id: {
+                targetId: {
                     allowNull: false,
                     type: sequelize_1.DataTypes.INTEGER
                 },
@@ -39,14 +39,14 @@ module.exports = {
                     type: sequelize_1.DataTypes.SMALLINT,
                     comment: "0: Waiting, 1: Accepted, 2: Canceled"
                 },
-                created_at: {
+                createdAt: {
                     allowNull: false,
                     type: sequelize_1.DataTypes.DATE,
                     defaultValue: Sequelize.literal("CURRENT_TIMESTAMP")
                 }
             });
             yield queryInterface.addConstraint('friends', {
-                fields: ['source_id'],
+                fields: ['sourceId'],
                 type: "foreign key",
                 references: {
                     table: "users",
@@ -56,7 +56,7 @@ module.exports = {
                 onUpdate: "cascade"
             });
             yield queryInterface.addConstraint('friends', {
-                fields: ['target_id'],
+                fields: ['targetId'],
                 type: "foreign key",
                 references: {
                     table: "users",

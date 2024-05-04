@@ -26,11 +26,11 @@ module.exports = {
                     type: sequelize_1.DataTypes.INTEGER,
                     autoIncrement: true
                 },
-                user_id: {
+                userId: {
                     allowNull: false,
                     type: sequelize_1.DataTypes.INTEGER
                 },
-                post_id: {
+                postId: {
                     allowNull: false,
                     type: sequelize_1.DataTypes.INTEGER
                 },
@@ -38,18 +38,18 @@ module.exports = {
                     type: sequelize_1.DataTypes.TEXT,
                     allowNull: false,
                 },
-                created_at: {
+                createdAt: {
                     type: sequelize_1.DataTypes.DATE,
                     allowNull: false,
                     defaultValue: Sequelize.literal("CURRENT_TIMESTAMP")
                 },
-                updated_at: {
+                updatedAt: {
                     type: sequelize_1.DataTypes.DATE,
                     allowNull: true
                 }
             });
             yield queryInterface.addConstraint("comments", {
-                fields: ['user_id'],
+                fields: ['userId'],
                 type: "foreign key",
                 references: {
                     table: "users",
@@ -59,7 +59,7 @@ module.exports = {
                 onUpdate: "cascade"
             });
             yield queryInterface.addConstraint("comments", {
-                fields: ['post_id'],
+                fields: ['postId'],
                 type: "foreign key",
                 references: {
                     table: "posts",

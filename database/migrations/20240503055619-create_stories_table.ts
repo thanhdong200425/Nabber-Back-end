@@ -17,7 +17,7 @@ module.exports = {
                 type: DataTypes.INTEGER,
                 autoIncrement: true
             },
-            user_id: {
+            userId: {
                 allowNull: false,
                 type: DataTypes.INTEGER,
             },
@@ -29,12 +29,12 @@ module.exports = {
                 allowNull: true,
                 type: DataTypes.TEXT
             },
-            created_at: {
+            createdAt: {
                 allowNull: false,
                 type: DataTypes.DATE,
                 defaultValue: Sequelize.literal("CURRENT_TIMESTAMP")
             },
-            updated_at: {
+            updatedAt: {
                 allowNull: true,
                 type: DataTypes.DATE
             }
@@ -42,7 +42,7 @@ module.exports = {
 
         await queryInterface.addConstraint("stories", {
             type: "foreign key",
-            fields: ['user_id'],
+            fields: ['userId'],
             references: {
                 table: "users",
                 field: 'id'

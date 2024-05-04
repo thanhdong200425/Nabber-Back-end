@@ -31,11 +31,11 @@ module.exports = {
                     allowNull: false,
                     type: sequelize_1.DataTypes.STRING
                 },
-                phone_number: {
+                phoneNumber: {
                     allowNull: true,
-                    type: sequelize_1.DataTypes.SMALLINT
+                    type: sequelize_1.DataTypes.INTEGER
                 },
-                password_hash: {
+                passwordHash: {
                     allowNull: false,
                     type: sequelize_1.DataTypes.TEXT
                 },
@@ -51,30 +51,30 @@ module.exports = {
                     allowNull: true,
                     type: sequelize_1.DataTypes.STRING
                 },
-                given_name: {
+                givenName: {
                     allowNull: true,
                     type: sequelize_1.DataTypes.TEXT
                 },
-                given_surname: {
+                givenSurname: {
                     allowNull: true,
                     type: sequelize_1.DataTypes.TEXT
                 },
                 gender: {
                     allowNull: true,
-                    type: sequelize_1.DataTypes.SMALLINT,
+                    type: sequelize_1.DataTypes.INTEGER,
                     comment: "0: Male, 1: Female"
                 },
-                last_login: {
+                lastLogin: {
                     allowNull: false,
                     type: sequelize_1.DataTypes.DATE,
                     defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
                 },
-                created_at: {
+                createdAt: {
                     type: sequelize_1.DataTypes.DATE,
                     allowNull: false,
                     defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
                 },
-                updated_at: {
+                updatedAt: {
                     type: sequelize_1.DataTypes.DATE,
                     allowNull: true
                 }

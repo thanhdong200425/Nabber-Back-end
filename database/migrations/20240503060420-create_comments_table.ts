@@ -17,11 +17,11 @@ module.exports = {
                 type: DataTypes.INTEGER,
                 autoIncrement: true
             },
-            user_id: {
+            userId: {
                 allowNull: false,
                 type: DataTypes.INTEGER
             },
-            post_id: {
+            postId: {
                 allowNull: false,
                 type: DataTypes.INTEGER
             },
@@ -29,19 +29,19 @@ module.exports = {
                 type: DataTypes.TEXT,
                 allowNull: false,
             },
-            created_at: {
+            createdAt: {
                 type: DataTypes.DATE,
                 allowNull: false,
                 defaultValue: Sequelize.literal("CURRENT_TIMESTAMP")
             },
-            updated_at: {
+            updatedAt: {
                 type: DataTypes.DATE,
                 allowNull: true
             }
         });
 
         await queryInterface.addConstraint("comments", {
-            fields: ['user_id'],
+            fields: ['userId'],
             type: "foreign key",
             references: {
                 table: "users",
@@ -52,7 +52,7 @@ module.exports = {
         })
 
         await queryInterface.addConstraint("comments", {
-            fields: ['post_id'],
+            fields: ['postId'],
             type: "foreign key",
             references: {
                 table: "posts",

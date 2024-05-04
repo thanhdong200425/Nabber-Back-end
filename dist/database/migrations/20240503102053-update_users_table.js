@@ -20,43 +20,9 @@ module.exports = {
              * Example:
              * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
              */
-            yield queryInterface.createTable("stories", {
-                id: {
-                    primaryKey: true,
-                    type: sequelize_1.DataTypes.INTEGER,
-                    autoIncrement: true
-                },
-                userId: {
-                    allowNull: false,
-                    type: sequelize_1.DataTypes.INTEGER,
-                },
-                content: {
-                    allowNull: true,
-                    type: sequelize_1.DataTypes.TEXT
-                },
-                image: {
-                    allowNull: true,
-                    type: sequelize_1.DataTypes.TEXT
-                },
-                createdAt: {
-                    allowNull: false,
-                    type: sequelize_1.DataTypes.DATE,
-                    defaultValue: Sequelize.literal("CURRENT_TIMESTAMP")
-                },
-                updatedAt: {
-                    allowNull: true,
-                    type: sequelize_1.DataTypes.DATE
-                }
-            });
-            yield queryInterface.addConstraint("stories", {
-                type: "foreign key",
-                fields: ['userId'],
-                references: {
-                    table: "users",
-                    field: 'id'
-                },
-                onUpdate: "cascade",
-                onDelete: "cascade"
+            yield queryInterface.addColumn('users', 'image', {
+                type: sequelize_1.DataTypes.TEXT,
+                allowNull: true
             });
         });
     },
@@ -68,7 +34,7 @@ module.exports = {
              * Example:
              * await queryInterface.dropTable('users');
              */
-            yield queryInterface.dropTable("stories");
+            yield queryInterface.removeColumn('users', 'image');
         });
     }
 };
