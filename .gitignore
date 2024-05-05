@@ -130,3 +130,7 @@ out
 
 # sequelize config file
 .sequelizerc
+
+# Config file
+database/config/
+dist/database/config/

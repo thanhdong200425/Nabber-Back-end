@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -15,20 +15,10 @@ const helper_1 = require("../../helper/helper");
 module.exports = {
     up(queryInterface, Sequelize) {
         return __awaiter(this, void 0, void 0, function* () {
-            /**
-             * Add seed commands here.
-             *
-             * Example:
-             * await queryInterface.bulkInsert('People', [{
-             *   name: 'John Doe',
-             *   isBetaMember: false
-             * }], {});
-             */
             let data = [];
             for (let i = 0; i < 10; i++) {
                 let randomEmail = faker_1.faker.internet.email(), randomPhoneNumber = (0, helper_1.generateNumber)(8, 9), password = 123, address = faker_1.faker.location.streetAddress(), dob = faker_1.faker.date.birthdate(), country = faker_1.faker.location.country(), givenName = faker_1.faker.person.lastName(), givenSurName = faker_1.faker.person.firstName(), gender = Math.floor(Math.random() * 2), lastLogin = new Date(), createdAt = new Date(), updatedAt = new Date(), image = faker_1.faker.image.avatarGitHub();
                 data.push({
-                    id: i,
                     email: randomEmail,
                     phoneNumber: randomPhoneNumber,
                     passwordHash: password,
@@ -41,10 +31,10 @@ module.exports = {
                     lastLogin: lastLogin,
                     createdAt: createdAt,
                     updatedAt: updatedAt,
-                    image: image
+                    image: image,
                 });
             }
-            return queryInterface.bulkInsert('users', data);
+            return queryInterface.bulkInsert("users", data);
         });
     },
     down(queryInterface, Sequelize) {
@@ -55,7 +45,7 @@ module.exports = {
              * Example:
              * await queryInterface.bulkDelete('People', null, {});
              */
-            yield queryInterface.bulkDelete('users', {});
+            yield queryInterface.bulkDelete("users", {});
         });
-    }
+    },
 };
