@@ -2,7 +2,7 @@ import sequelize from "./sequelize";
 import {DataTypes} from "sequelize";
 
 export type comment = {
-    id: number,
+    id?: number,
     userId: number,
     postId: number,
     content: string,

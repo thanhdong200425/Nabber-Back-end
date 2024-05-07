@@ -33,8 +33,7 @@ module.exports = {
             let data = [];
             for (let i = 0; i < 10; i++) {
                 data.push({
-                    id: i,
-                    userId: Math.floor(Math.random() * lengthArray),
+                    userId: Math.floor(Math.random() * lengthArray + 1),
                     content: faker_1.faker.lorem.text(),
                     createdAt: new Date(),
                     updatedAt: new Date()

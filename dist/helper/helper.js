@@ -23,7 +23,7 @@ exports.saltRounds = saltRounds;
 const generateNumber = function (quantity, maxValue) {
     let phoneNumber = [0];
     for (let i = 0; i < quantity; i++) {
-        phoneNumber.push(Math.floor(Math.random() * maxValue));
+        phoneNumber.push(Math.ceil(Math.random() * maxValue));
     }
     return parseInt(phoneNumber.join(""));
 };

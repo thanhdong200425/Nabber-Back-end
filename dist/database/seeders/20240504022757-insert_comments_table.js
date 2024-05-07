@@ -31,7 +31,6 @@ module.exports = {
                 data.push({
                     content: faker_1.faker.lorem.text(),
                     createdAt: new Date(),
-                    id: i,
                     postId: (0, helper_1.generateNumber)(1, lengthPosts),
                     userId: (0, helper_1.generateNumber)(1, lengthUsers)
                 });

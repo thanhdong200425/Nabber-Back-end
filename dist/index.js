@@ -17,17 +17,24 @@ const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const User_1 = __importDefault(require("./database/models/User"));
 const helper_1 = require("./helper/helper");
+const os_1 = __importDefault(require("os"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT;
 // Middleware
-app.use(express_1.default.urlencoded());
+app.use(express_1.default.urlencoded()); // Parse incoming urlencoded payloads
+app.use(express_1.default.json()); // Parse incoming json payloads
+app.get("/", (reg, res) => {
+    return res.json({ message: "OK" });
+});
 // Sign in route
 app.post("/sign-in", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
+    console.log(req.body);
     const validUser = yield User_1.default.authenticate(email, password);
+    console.log("Valid user: " + validUser);
     if (validUser)
-        return res.json(validUser);
+        return res.status(200).json(validUser);
     return res.status(400).json({ message: "User not found" });
 }));
 // Sign up route
@@ -52,5 +59,8 @@ app.post("/sign-up", (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 }));
 app.listen(port, () => {
-    console.log(`Server is running on ${port}`);
+    var _a, _b;
+    const networkInterfaces = os_1.default.networkInterfaces();
+    const ip = ((_b = (_a = networkInterfaces["eth0"]) === null || _a === void 0 ? void 0 : _a.find((iface) => iface.family === "IPv4")) === null || _b === void 0 ? void 0 : _b.address) || "localhost";
+    console.log(`Server is running on ${ip} and ${port}`);
 });

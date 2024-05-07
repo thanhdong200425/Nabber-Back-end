@@ -2,7 +2,7 @@ import sequelize from "./sequelize";
 import {DataTypes} from "sequelize";
 
 export type story = {
-    id: number,
+    id?: number,
     userId: number,
     content: string,
     image: string,

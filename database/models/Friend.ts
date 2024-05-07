@@ -2,7 +2,7 @@ import sequelize from "./sequelize";
 import {DataTypes} from "sequelize";
 
 export type friend = {
-    id: number,
+    id?: number,
     sourceId: number,
     targetId: number,
     status: number,

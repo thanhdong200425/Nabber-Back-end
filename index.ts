@@ -3,20 +3,27 @@ import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import User from "./database/models/User";
 import { hashPassword, reg } from "./helper/helper";
+import os from "os";
 
 dotenv.config();
 const app = express();
 const port = process.env.PORT;
 
 // Middleware
-app.use(express.urlencoded());
+app.use(express.urlencoded()); // Parse incoming urlencoded payloads
+app.use(express.json()); // Parse incoming json payloads
+
+app.get("/", (reg: Request, res: Response) => {
+    return res.json({ message: "OK" });
+});
 
 // Sign in route
 app.post("/sign-in", async (req: Request, res: Response) => {
     const { email, password } = req.body;
+    console.log(req.body);
     const validUser = await User.authenticate(email, password);
-
-    if (validUser) return res.json(validUser);
+    console.log("Valid user: " + validUser);
+    if (validUser) return res.status(200).json(validUser);
 
     return res.status(400).json({ message: "User not found" });
 });
@@ -42,5 +49,7 @@ app.post("/sign-up", async (req: Request, res: Response) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server is running on ${port}`);
+    const networkInterfaces = os.networkInterfaces();
+    const ip = networkInterfaces["eth0"]?.find((iface) => iface.family === "IPv4")?.address || "localhost";
+    console.log(`Server is running on ${ip} and ${port}`);
 });

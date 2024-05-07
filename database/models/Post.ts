@@ -2,7 +2,7 @@ import sequelize from "./sequelize";
 import {DataTypes} from "sequelize";
 
 export type post = {
-    id: number,
+    id?: number,
     userId: number,
     content: string,
     createdAt: Date,

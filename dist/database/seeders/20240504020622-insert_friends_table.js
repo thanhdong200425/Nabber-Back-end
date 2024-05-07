@@ -39,9 +39,8 @@ module.exports = {
                 } while (sourceId === targetId);
                 data.push({
                     createdAt: new Date(),
-                    id: i,
                     sourceId: sourceId,
-                    status: Math.floor(Math.random() * 3),
+                    status: Math.ceil(Math.random() * 3),
                     targetId: targetId
                 });
             }

@@ -33,8 +33,7 @@ module.exports = {
             const data = [];
             for (let i = 0; i < 10; i++) {
                 data.push({
-                    id: i,
-                    userId: Math.floor(Math.random() * length),
+                    userId: Math.floor(Math.random() * length + 1),
                     content: faker_1.faker.lorem.text(),
                     image: faker_1.faker.image.urlPicsumPhotos(),
                     createdAt: new Date(),
