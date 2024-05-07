@@ -1,5 +1,7 @@
-import { DataTypes, Model, QueryTypes } from "sequelize";
+import {DataTypes, Model, QueryTypes} from "sequelize";
 import sequelize from "./sequelize";
+import {hashPassword} from "../../helper/helper";
+import bcrypt, {compare} from "bcrypt";
 
 export type user = {
     id?: number;
@@ -20,13 +22,21 @@ export type user = {
 
 class User extends Model {
     public static async authenticate(email: String, password: String) {
-        const query = 'SELECT email, "passwordHash" FROM users WHERE email=:email AND "passwordHash"=:passwordHash';
+        const query = 'SELECT email, "passwordHash" FROM users WHERE email=:email';
         try {
             const validUser = await sequelize.query(query, {
-                replacements: { email: email, passwordHash: password },
+                replacements: {email: email},
                 type: QueryTypes.SELECT,
             });
-            if (validUser) return validUser[0];
+            if (validUser.length > 0) {
+                const user = validUser[0];
+                // @ts-ignore
+                const {email, passwordHash} = user;
+                // @ts-ignore
+                const isMatch = await bcrypt.compare(password, passwordHash);
+                if (isMatch) return user;
+                else return false;
+            }
         } catch (error: any) {
             console.log(error);
         }

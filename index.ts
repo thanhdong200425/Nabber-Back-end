@@ -20,9 +20,7 @@ app.get("/", (reg: Request, res: Response) => {
 // Sign in route
 app.post("/sign-in", async (req: Request, res: Response) => {
     const { email, password } = req.body;
-    console.log(req.body);
     const validUser = await User.authenticate(email, password);
-    console.log("Valid user: " + validUser);
     if (validUser) return res.status(200).json(validUser);
 
     return res.status(400).json({ message: "User not found" });
@@ -31,6 +29,7 @@ app.post("/sign-in", async (req: Request, res: Response) => {
 // Sign up route
 app.post("/sign-up", async (req: Request, res: Response) => {
     const { givenName, email, password } = req.body;
+    console.log(givenName, email, password);
     try {
         if (reg.test(password)) {
             const hashedPassword = await hashPassword(password);
@@ -39,9 +38,9 @@ app.post("/sign-up", async (req: Request, res: Response) => {
                 passwordHash: hashedPassword,
                 givenName: givenName,
             });
-            return res.json({ message: "OK" }).status(200);
+            return res.json({ message: "OK", data: newUser }).status(200);
         }
-        return res.json({ message: "Password must have at least 1 special character, 1 uppercase letter and 1 number" });
+        return res.status(400).json({ message: "Password must have at least 1 special character, 1 uppercase letter and 1 number" });
     } catch (error: any) {
         if (error.message === "Error hash password") return res.status(500).json({ message: "Error when hash password" });
         console.log(error);
@@ -49,7 +48,5 @@ app.post("/sign-up", async (req: Request, res: Response) => {
 });
 
 app.listen(port, () => {
-    const networkInterfaces = os.networkInterfaces();
-    const ip = networkInterfaces["eth0"]?.find((iface) => iface.family === "IPv4")?.address || "localhost";
-    console.log(`Server is running on ${ip} and ${port}`);
+    console.log(`Server is running on ${port}`);
 });
