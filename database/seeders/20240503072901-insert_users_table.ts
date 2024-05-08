@@ -1,9 +1,9 @@
 "use strict";
 
-import { QueryInterface, Sequelize } from "sequelize";
-import { user } from "../models/User";
-import { faker } from "@faker-js/faker";
-import { generateNumber } from "../../helper/helper";
+import {QueryInterface, Sequelize} from "sequelize";
+import {user} from "../models/User";
+import {fa, faker} from "@faker-js/faker";
+import {generateNumber} from "../../helper/helper";
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -22,7 +22,9 @@ module.exports = {
                 lastLogin = new Date(),
                 createdAt = new Date(),
                 updatedAt = new Date(),
-                image = faker.image.avatarGitHub();
+                image = faker.image.avatarGitHub(),
+                username = "@" + givenName.toLowerCase(),
+                coverImage = faker.image.urlPicsumPhotos();
 
             data.push({
                 email: randomEmail,
@@ -38,6 +40,8 @@ module.exports = {
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 image: image,
+                username: username,
+                coverImage: coverImage
             });
         }
 

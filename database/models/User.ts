@@ -18,6 +18,8 @@ export type user = {
     createdAt: Date;
     updatedAt: Date;
     image: String;
+    coverImage?: string,
+    username?: string
 };
 
 class User extends Model {
@@ -106,6 +108,14 @@ User.init(
             type: DataTypes.TEXT,
             allowNull: true,
         },
+        coverImage: {
+            type: DataTypes.TEXT,
+            allowNull: true
+        },
+        username: {
+            type: DataTypes.TEXT,
+            allowNull: true
+        }
     },
     {
         sequelize,

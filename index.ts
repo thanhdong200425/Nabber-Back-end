@@ -1,8 +1,8 @@
-import express, { Request, Response } from "express";
+import express, {Request, Response} from "express";
 // @ts-ignore
 import dotenv from "dotenv";
 import User from "./database/models/User";
-import { hashPassword, reg } from "./helper/helper";
+import {hashPassword, reg} from "./helper/helper";
 import os from "os";
 
 dotenv.config();
@@ -14,22 +14,24 @@ app.use(express.urlencoded()); // Parse incoming urlencoded payloads
 app.use(express.json()); // Parse incoming json payloads
 
 app.get("/", (reg: Request, res: Response) => {
-    return res.json({ message: "OK" });
+    return res.json({message: "OK"});
 });
 
 // Sign in route
 app.post("/sign-in", async (req: Request, res: Response) => {
-    const { email, password } = req.body;
+    const {email, password} = req.body;
     const validUser = await User.authenticate(email, password);
-    if (validUser) return res.status(200).json(validUser);
+    if (validUser) {
+        const userInfo = await User.findOne({where: {email: email}})
+        return res.status(200).json({data: userInfo});
+    }
 
-    return res.status(400).json({ message: "User not found" });
+    return res.status(400).json({message: "User not found"});
 });
 
 // Sign up route
 app.post("/sign-up", async (req: Request, res: Response) => {
-    const { givenName, email, password } = req.body;
-    console.log(givenName, email, password);
+    const {givenName, email, password} = req.body;
     try {
         if (reg.test(password)) {
             const hashedPassword = await hashPassword(password);
@@ -38,11 +40,14 @@ app.post("/sign-up", async (req: Request, res: Response) => {
                 passwordHash: hashedPassword,
                 givenName: givenName,
             });
-            return res.json({ message: "OK", data: newUser }).status(200);
+
+            const newUserReturn = await User.findOne({where: {email: email}});
+
+            return res.json({message: "OK", data: newUserReturn}).status(200);
         }
-        return res.status(400).json({ message: "Password must have at least 1 special character, 1 uppercase letter and 1 number" });
+        return res.status(400).json({message: "Password must have at least 1 special character, 1 uppercase letter and 1 number"});
     } catch (error: any) {
-        if (error.message === "Error hash password") return res.status(500).json({ message: "Error when hash password" });
+        if (error.message === "Error hash password") return res.status(500).json({message: "Error when hash password"});
         console.log(error);
     }
 });

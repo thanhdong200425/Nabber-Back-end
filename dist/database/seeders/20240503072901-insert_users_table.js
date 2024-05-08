@@ -17,7 +17,7 @@ module.exports = {
         return __awaiter(this, void 0, void 0, function* () {
             let data = [];
             for (let i = 0; i < 10; i++) {
-                let randomEmail = faker_1.faker.internet.email(), randomPhoneNumber = (0, helper_1.generateNumber)(8, 9), password = 123, address = faker_1.faker.location.streetAddress(), dob = faker_1.faker.date.birthdate(), country = faker_1.faker.location.country(), givenName = faker_1.faker.person.lastName(), givenSurName = faker_1.faker.person.firstName(), gender = Math.floor(Math.random() * 2), lastLogin = new Date(), createdAt = new Date(), updatedAt = new Date(), image = faker_1.faker.image.avatarGitHub();
+                let randomEmail = faker_1.faker.internet.email(), randomPhoneNumber = (0, helper_1.generateNumber)(8, 9), password = 123, address = faker_1.faker.location.streetAddress(), dob = faker_1.faker.date.birthdate(), country = faker_1.faker.location.country(), givenName = faker_1.faker.person.lastName(), givenSurName = faker_1.faker.person.firstName(), gender = Math.floor(Math.random() * 2), lastLogin = new Date(), createdAt = new Date(), updatedAt = new Date(), image = faker_1.faker.image.avatarGitHub(), username = "@" + givenName.toLowerCase(), coverImage = faker_1.faker.image.urlPicsumPhotos();
                 data.push({
                     email: randomEmail,
                     phoneNumber: randomPhoneNumber,
@@ -32,6 +32,8 @@ module.exports = {
                     createdAt: createdAt,
                     updatedAt: updatedAt,
                     image: image,
+                    username: username,
+                    coverImage: coverImage
                 });
             }
             return queryInterface.bulkInsert("users", data);

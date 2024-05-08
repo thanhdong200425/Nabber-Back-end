@@ -14,17 +14,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
 const sequelize_2 = __importDefault(require("./sequelize"));
+const bcrypt_1 = __importDefault(require("bcrypt"));
 class User extends sequelize_1.Model {
     static authenticate(email, password) {
         return __awaiter(this, void 0, void 0, function* () {
-            const query = 'SELECT email, "passwordHash" FROM users WHERE email=:email AND "passwordHash"=:passwordHash';
+            const query = 'SELECT email, "passwordHash" FROM users WHERE email=:email';
             try {
                 const validUser = yield sequelize_2.default.query(query, {
-                    replacements: { email: email, passwordHash: password },
+                    replacements: { email: email },
                     type: sequelize_1.QueryTypes.SELECT,
                 });
-                if (validUser)
-                    return validUser[0];
+                if (validUser.length > 0) {
+                    const user = validUser[0];
+                    // @ts-ignore
+                    const { email, passwordHash } = user;
+                    // @ts-ignore
+                    const isMatch = yield bcrypt_1.default.compare(password, passwordHash);
+                    if (isMatch)
+                        return user;
+                    else
+                        return false;
+                }
             }
             catch (error) {
                 console.log(error);
@@ -94,6 +104,14 @@ User.init({
         type: sequelize_1.DataTypes.TEXT,
         allowNull: true,
     },
+    coverImage: {
+        type: sequelize_1.DataTypes.TEXT,
+        allowNull: true
+    },
+    username: {
+        type: sequelize_1.DataTypes.TEXT,
+        allowNull: true
+    }
 }, {
     sequelize: sequelize_2.default,
     modelName: "user",
