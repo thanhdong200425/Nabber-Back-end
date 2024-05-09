@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -29,17 +29,18 @@ module.exports = {
              */
             const user = yield User_1.default.findAll();
             // @ts-ignore
-            const userIdArray = user.map(user => user.id), lengthArray = userIdArray.length;
+            const userIdArray = user.map((user) => user.id), lengthArray = userIdArray.length;
             let data = [];
             for (let i = 0; i < 10; i++) {
                 data.push({
                     userId: Math.floor(Math.random() * lengthArray + 1),
                     content: faker_1.faker.lorem.text(),
                     createdAt: new Date(),
-                    updatedAt: new Date()
+                    updatedAt: new Date(),
+                    image: faker_1.faker.image.urlPicsumPhotos(),
                 });
             }
-            yield queryInterface.bulkInsert('posts', data);
+            yield queryInterface.bulkInsert("posts", data);
         });
     },
     down(queryInterface, Sequelize) {
@@ -50,7 +51,7 @@ module.exports = {
              * Example:
              * await queryInterface.bulkDelete('People', null, {});
              */
-            yield queryInterface.bulkDelete('posts', {});
+            yield queryInterface.bulkDelete("posts", {});
         });
-    }
+    },
 };

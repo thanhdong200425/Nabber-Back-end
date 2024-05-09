@@ -17,12 +17,16 @@ const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const User_1 = __importDefault(require("./database/models/User"));
 const helper_1 = require("./helper/helper");
+const IsLogin_1 = __importDefault(require("./middleware/IsLogin"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT;
+const apiPost = express_1.default.Router();
 // Middleware
 app.use(express_1.default.urlencoded()); // Parse incoming urlencoded payloads
 app.use(express_1.default.json()); // Parse incoming json payloads
+app.use("/post", apiPost); // Mount a module that will be handled with "/post" prefix
 app.get("/", (reg, res) => {
     return res.json({ message: "OK" });
 });
@@ -32,23 +36,29 @@ app.post("/sign-in", (req, res) => __awaiter(void 0, void 0, void 0, function* (
     const validUser = yield User_1.default.authenticate(email, password);
     if (validUser) {
         const userInfo = yield User_1.default.findOne({ where: { email: email } });
-        return res.status(200).json({ data: userInfo });
+        // @ts-ignore
+        res.header('loginToken', userInfo.loginToken);
+        return res.status(200).json({ data: userInfo, loginToken: res.getHeader('loginToken') });
     }
     return res.status(400).json({ message: "User not found" });
 }));
 // Sign up route
 app.post("/sign-up", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { givenName, email, password } = req.body;
-    console.log(givenName, email, password);
     try {
         if (helper_1.reg.test(password)) {
             const hashedPassword = yield (0, helper_1.hashPassword)(password);
+            // @ts-ignore
+            const loginToken = jsonwebtoken_1.default.sign({ email: email }, process.env.ENV_SECRET_KEY, { expiresIn: "30 days" });
             const newUser = yield User_1.default.create({
                 email: email,
                 passwordHash: hashedPassword,
                 givenName: givenName,
+                loginToken: loginToken
             });
-            return res.json({ message: "OK", data: newUser }).status(200);
+            res.header("loginToken", loginToken);
+            const newUserReturn = yield User_1.default.findOne({ where: { email: email } });
+            return res.json({ message: "OK", data: newUserReturn }).status(200);
         }
         return res.status(400).json({ message: "Password must have at least 1 special character, 1 uppercase letter and 1 number" });
     }
@@ -58,6 +68,12 @@ app.post("/sign-up", (req, res) => __awaiter(void 0, void 0, void 0, function* (
         console.log(error);
     }
 }));
+// CRUD API for Posts
+apiPost.use(IsLogin_1.default);
+apiPost.get("/", (req, res) => {
+    // @ts-ignore
+    return res.json({ message: "Get post", email: req.user.email });
+});
 app.listen(port, () => {
     console.log(`Server is running on ${port}`);
 });

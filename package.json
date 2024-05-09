@@ -15,7 +15,7 @@
         "seed:generate": "sequelize-cli seed:generate --name",
         "seed:all": "tsc && sequelize-cli db:seed:all",
         "seed": "tsc && sequelize-cli db:seed --seed",
-        "server": "nodemon"
+        "server": "tsc && nodemon index.ts"
     },
     "author": "Thanh Dong",
     "license": "ISC",
@@ -23,6 +23,7 @@
         "bcrypt": "^5.1.1",
         "dotenv": "^16.4.5",
         "express": "^4.19.2",
+        "jsonwebtoken": "^9.0.2",
         "pg": "^8.11.5",
         "sequelize": "^6.37.3",
         "sequelize-cli": "^6.6.2",
@@ -33,6 +34,7 @@
         "@faker-js/faker": "^8.4.1",
         "@types/bcrypt": "^5.0.2",
         "@types/express": "^4.17.21",
+        "@types/jsonwebtoken": "^9.0.6",
         "@types/node": "^20.12.7",
         "nodemon": "^3.1.0",
         "ts-node": "^10.9.2",

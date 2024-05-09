@@ -106,12 +106,16 @@ User.init({
     },
     coverImage: {
         type: sequelize_1.DataTypes.TEXT,
-        allowNull: true
+        allowNull: true,
     },
     username: {
         type: sequelize_1.DataTypes.TEXT,
-        allowNull: true
-    }
+        allowNull: true,
+    },
+    loginToken: {
+        type: sequelize_1.DataTypes.TEXT,
+        allowNull: false,
+    },
 }, {
     sequelize: sequelize_2.default,
     modelName: "user",

@@ -1,9 +1,10 @@
 "use strict";
 
-import {QueryInterface, Sequelize} from "sequelize";
-import {user} from "../models/User";
-import {fa, faker} from "@faker-js/faker";
-import {generateNumber} from "../../helper/helper";
+import { QueryInterface, Sequelize } from "sequelize";
+import { user } from "../models/User";
+import { fa, faker } from "@faker-js/faker";
+import { generateNumber } from "../../helper/helper";
+import jwt from "jsonwebtoken";
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -24,7 +25,9 @@ module.exports = {
                 updatedAt = new Date(),
                 image = faker.image.avatarGitHub(),
                 username = "@" + givenName.toLowerCase(),
-                coverImage = faker.image.urlPicsumPhotos();
+                coverImage = faker.image.urlPicsumPhotos(),
+                // @ts-ignore
+                token = jwt.sign({ email: randomEmail }, process.env.ENV_SECRET_KEY, { expiresIn: "30 days" });
 
             data.push({
                 email: randomEmail,
@@ -41,7 +44,8 @@ module.exports = {
                 updatedAt: updatedAt,
                 image: image,
                 username: username,
-                coverImage: coverImage
+                coverImage: coverImage,
+                loginToken: token,
             });
         }
 

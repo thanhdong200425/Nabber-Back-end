@@ -9,24 +9,28 @@ const Post = sequelize_1.default.define("post", {
     id: {
         primaryKey: true,
         autoIncrement: true,
-        type: sequelize_2.DataTypes.INTEGER
+        type: sequelize_2.DataTypes.INTEGER,
     },
     userId: {
         allowNull: false,
-        type: sequelize_2.DataTypes.INTEGER
+        type: sequelize_2.DataTypes.INTEGER,
     },
     content: {
         allowNull: true,
-        type: sequelize_2.DataTypes.TEXT
+        type: sequelize_2.DataTypes.TEXT,
+    },
+    image: {
+        type: sequelize_2.DataTypes.TEXT,
+        allowNull: true,
     },
     createdAt: {
         allowNull: false,
         type: sequelize_2.DataTypes.DATE,
-        defaultValue: sequelize_2.DataTypes.NOW
+        defaultValue: sequelize_2.DataTypes.NOW,
     },
     updatedAt: {
         allowNull: true,
-        type: sequelize_2.DataTypes.DATE
-    }
+        type: sequelize_2.DataTypes.DATE,
+    },
 });
 exports.default = Post;

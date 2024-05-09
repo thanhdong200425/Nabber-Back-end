@@ -14,25 +14,15 @@ const sequelize_1 = require("sequelize");
 module.exports = {
     up(queryInterface, Sequelize) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield queryInterface.addColumn("users", "coverImage", {
+            yield queryInterface.addColumn("posts", "image", {
                 type: sequelize_1.DataTypes.TEXT,
                 allowNull: true,
-            });
-            yield queryInterface.addColumn("users", "username", {
-                type: sequelize_1.DataTypes.TEXT,
-                allowNull: true,
-            });
-            yield queryInterface.addColumn("users", "loginToken", {
-                type: sequelize_1.DataTypes.TEXT,
-                allowNull: false,
             });
         });
     },
     down(queryInterface, Sequelize) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield queryInterface.removeColumn("users", "username");
-            yield queryInterface.removeColumn("users", "coverImage");
-            yield queryInterface.removeColumn("users", "loginToken");
+            yield queryInterface.removeColumn("posts", "image");
         });
     },
 };

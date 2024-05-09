@@ -1,7 +1,7 @@
-import {DataTypes, Model, QueryTypes} from "sequelize";
+import { DataTypes, Model, QueryTypes } from "sequelize";
 import sequelize from "./sequelize";
-import {hashPassword} from "../../helper/helper";
-import bcrypt, {compare} from "bcrypt";
+import { hashPassword } from "../../helper/helper";
+import bcrypt, { compare } from "bcrypt";
 
 export type user = {
     id?: number;
@@ -18,8 +18,9 @@ export type user = {
     createdAt: Date;
     updatedAt: Date;
     image: String;
-    coverImage?: string,
-    username?: string
+    coverImage?: string;
+    username?: string;
+    loginToken: string;
 };
 
 class User extends Model {
@@ -27,13 +28,13 @@ class User extends Model {
         const query = 'SELECT email, "passwordHash" FROM users WHERE email=:email';
         try {
             const validUser = await sequelize.query(query, {
-                replacements: {email: email},
+                replacements: { email: email },
                 type: QueryTypes.SELECT,
             });
             if (validUser.length > 0) {
                 const user = validUser[0];
                 // @ts-ignore
-                const {email, passwordHash} = user;
+                const { email, passwordHash } = user;
                 // @ts-ignore
                 const isMatch = await bcrypt.compare(password, passwordHash);
                 if (isMatch) return user;
@@ -110,12 +111,16 @@ User.init(
         },
         coverImage: {
             type: DataTypes.TEXT,
-            allowNull: true
+            allowNull: true,
         },
         username: {
             type: DataTypes.TEXT,
-            allowNull: true
-        }
+            allowNull: true,
+        },
+        loginToken: {
+            type: DataTypes.TEXT,
+            allowNull: false,
+        },
     },
     {
         sequelize,

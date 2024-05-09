@@ -1,9 +1,9 @@
-'use strict';
+"use strict";
 
-import {QueryInterface, Sequelize} from "sequelize";
+import { QueryInterface, Sequelize } from "sequelize";
 import User from "../models/User";
-import {post} from "../models/Post";
-import {faker} from "@faker-js/faker";
+import { post } from "../models/Post";
+import { faker } from "@faker-js/faker";
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -19,7 +19,7 @@ module.exports = {
          */
         const user = await User.findAll();
         // @ts-ignore
-        const userIdArray = user.map(user => user.id),
+        const userIdArray = user.map((user) => user.id),
             lengthArray = userIdArray.length;
 
         let data: post[] = [];
@@ -28,11 +28,12 @@ module.exports = {
                 userId: Math.floor(Math.random() * lengthArray + 1),
                 content: faker.lorem.text(),
                 createdAt: new Date(),
-                updatedAt: new Date()
-            })
+                updatedAt: new Date(),
+                image: faker.image.urlPicsumPhotos(),
+            });
         }
 
-        await queryInterface.bulkInsert('posts', data);
+        await queryInterface.bulkInsert("posts", data);
     },
 
     async down(queryInterface: QueryInterface, Sequelize: Sequelize) {
@@ -42,6 +43,6 @@ module.exports = {
          * Example:
          * await queryInterface.bulkDelete('People', null, {});
          */
-        await queryInterface.bulkDelete('posts', {});
-    }
+        await queryInterface.bulkDelete("posts", {});
+    },
 };
