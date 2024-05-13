@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hashPassword = exports.saltRounds = exports.reg = exports.generateNumber = void 0;
+exports.groupArray = exports.hashPassword = exports.saltRounds = exports.reg = exports.generateNumber = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 dotenv_1.default.config();
@@ -41,3 +41,14 @@ const hashPassword = function (password) {
     });
 };
 exports.hashPassword = hashPassword;
+const groupArray = function (arr, quantity) {
+    let chunkedArray = {}, length = arr.length, key = 1;
+    for (let i = 0; i < length; i += quantity) {
+        if (i + quantity >= length)
+            quantity = length;
+        chunkedArray[key] = arr.slice(i, quantity);
+        key++;
+    }
+    return chunkedArray;
+};
+exports.groupArray = groupArray;

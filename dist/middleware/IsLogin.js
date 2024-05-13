@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 function isLogin(req, res, next) {
     const token = req.headers.logintoken;
-    console.log(token);
+    console.log(req.headers);
     if (!token)
         return res.status(401).json({ message: "Token is required" });
     // @ts-ignore

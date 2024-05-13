@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 
 export default function isLogin(req: Request, res: Response, next: NextFunction) {
     const token = req.headers.logintoken;
-    console.log(token);
+    console.log(req.headers);
 
     if (!token) return res.status(401).json({ message: "Token is required" });
 

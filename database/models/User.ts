@@ -1,7 +1,6 @@
-import { DataTypes, Model, QueryTypes } from "sequelize";
+import {DataTypes, Model, QueryTypes} from "sequelize";
 import sequelize from "./sequelize";
-import { hashPassword } from "../../helper/helper";
-import bcrypt, { compare } from "bcrypt";
+import bcrypt from "bcrypt";
 
 export type user = {
     id?: number;
@@ -24,17 +23,17 @@ export type user = {
 };
 
 class User extends Model {
-    public static async authenticate(email: String, password: String) {
+    public static async authenticate(email: string, password: string) {
         const query = 'SELECT email, "passwordHash" FROM users WHERE email=:email';
         try {
             const validUser = await sequelize.query(query, {
-                replacements: { email: email },
+                replacements: {email: email},
                 type: QueryTypes.SELECT,
             });
             if (validUser.length > 0) {
                 const user = validUser[0];
                 // @ts-ignore
-                const { email, passwordHash } = user;
+                const {email, passwordHash} = user;
                 // @ts-ignore
                 const isMatch = await bcrypt.compare(password, passwordHash);
                 if (isMatch) return user;
@@ -44,6 +43,37 @@ class User extends Model {
             console.log(error);
         }
         return null;
+    }
+
+    public static async getId(email: string, password: string) {
+        const query = 'SELECT id from users where email=:email';
+        try {
+            const validUser = await sequelize.query(query, {
+                replacements: {email: email},
+                type: QueryTypes.SELECT
+            })
+
+            if (validUser.length > 0) return validUser[0];
+            return null;
+        } catch (error) {
+            console.log("Error when get ID of user: " + error);
+        }
+    }
+
+    public static async getPostOfFriends(userId: number) {
+        const query = 'SELECT posts.*, users."givenName", users."givenSurname", users.image as "userImage", users.country FROM posts JOIN friends ON posts."userId" = friends."targetId" JOIN users ON users.id = posts."userId" WHERE friends."sourceId"=:id'
+        console.log(userId);
+        try {
+            const listUser = await sequelize.query(query, {
+                replacements: {id: userId},
+                type: QueryTypes.SELECT
+            })
+
+
+            return listUser.length <= 0 ? null : listUser;
+        } catch (error) {
+            console.log("Error when get posts of friend: " + error);
+        }
     }
 }
 

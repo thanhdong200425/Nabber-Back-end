@@ -26,4 +26,16 @@ const hashPassword = async function (password: String) {
     }
 };
 
-export { generateNumber, reg, saltRounds, hashPassword };
+const groupArray = function (arr: object[], quantity: number): object {
+    let chunkedArray: { [key: number]: object[] } = {}, length = arr.length, key = 1;
+
+    for (let i = 0; i < length; i += quantity) {
+        if (i + quantity >= length) quantity = length;
+        chunkedArray[key] = arr.slice(i, quantity)
+        key++;
+    }
+
+    return chunkedArray;
+}
+
+export {generateNumber, reg, saltRounds, hashPassword, groupArray};

@@ -19,6 +19,7 @@ const User_1 = __importDefault(require("./database/models/User"));
 const helper_1 = require("./helper/helper");
 const IsLogin_1 = __importDefault(require("./middleware/IsLogin"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const Post_1 = __importDefault(require("./database/models/Post"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT;
@@ -37,8 +38,8 @@ app.post("/sign-in", (req, res) => __awaiter(void 0, void 0, void 0, function* (
     if (validUser) {
         const userInfo = yield User_1.default.findOne({ where: { email: email } });
         // @ts-ignore
-        res.header('loginToken', userInfo.loginToken);
-        return res.status(200).json({ data: userInfo, loginToken: res.getHeader('loginToken') });
+        res.header("loginToken", userInfo.loginToken);
+        return res.status(200).json({ data: userInfo, loginToken: res.getHeader("loginToken") });
     }
     return res.status(400).json({ message: "User not found" });
 }));
@@ -54,7 +55,7 @@ app.post("/sign-up", (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 email: email,
                 passwordHash: hashedPassword,
                 givenName: givenName,
-                loginToken: loginToken
+                loginToken: loginToken,
             });
             res.header("loginToken", loginToken);
             const newUserReturn = yield User_1.default.findOne({ where: { email: email } });
@@ -70,10 +71,17 @@ app.post("/sign-up", (req, res) => __awaiter(void 0, void 0, void 0, function* (
 }));
 // CRUD API for Posts
 apiPost.use(IsLogin_1.default);
-apiPost.get("/", (req, res) => {
+apiPost.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // @ts-ignore
-    return res.json({ message: "Get post", email: req.user.email });
-});
+    let email = req.user.email;
+    let user = yield User_1.default.findOne({ where: { email: email } });
+    // @ts-ignore
+    let userId = user.id;
+    let allPost = yield Post_1.default.findAll({ where: { userId: userId } });
+    let newArray = (0, helper_1.groupArray)(allPost, 3);
+    // @ts-ignore
+    return res.status(200).json({ post: allPost, groupArray: newArray });
+}));
 app.listen(port, () => {
     console.log(`Server is running on ${port}`);
 });
