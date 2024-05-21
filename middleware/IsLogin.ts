@@ -1,9 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import jwt from "jsonwebtoken";
+import * as jwt from "jsonwebtoken";
 
 export default function isLogin(req: Request, res: Response, next: NextFunction) {
     const token = req.headers.logintoken;
-    console.log(req.headers);
 
     if (!token) return res.status(401).json({ message: "Token is required" });
 
@@ -14,7 +13,7 @@ export default function isLogin(req: Request, res: Response, next: NextFunction)
         }
 
         // @ts-ignore
-        req.user = user;
+        req.body.user = user;
         next();
     });
 }

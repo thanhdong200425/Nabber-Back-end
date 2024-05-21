@@ -1,23 +1,13 @@
-import {Sequelize} from "sequelize";
-import dotenv from "dotenv";
+import { Sequelize } from "sequelize";
+import "dotenv/config";
 
-dotenv.config();
+const { DB_NAME, DB_USERNAME, DB_PASSWORD, DB_PORT, DB_DIALECT, DB_HOST } = process.env;
 
-const {
-    DB_NAME,
-    DB_USERNAME,
-    DB_PASSWORD,
-    DB_PORT,
-    DB_DIALECT,
-    DB_HOST
-} = process.env
-
-if (!DB_DIALECT || !DB_HOST || !DB_NAME || !DB_PORT || !DB_USERNAME || !DB_PASSWORD)
-    throw new Error("Invalid information of database");
+if (!DB_DIALECT || !DB_HOST || !DB_NAME || !DB_PORT || !DB_USERNAME || !DB_PASSWORD) throw new Error("Invalid information of database");
 
 const sequelize = new Sequelize(DB_NAME, DB_USERNAME, DB_PASSWORD, {
     host: DB_HOST,
-    dialect: "postgres"
+    dialect: "postgres",
 });
 
 export default sequelize;

@@ -15,7 +15,7 @@
         "seed:generate": "sequelize-cli seed:generate --name",
         "seed:all": "tsc && sequelize-cli db:seed:all",
         "seed": "tsc && sequelize-cli db:seed --seed",
-        "server": "nodemon"
+        "server": "tsc && nodemon"
     },
     "author": "Thanh Dong",
     "license": "ISC",

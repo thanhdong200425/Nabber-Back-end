@@ -1,5 +1,5 @@
-import dotenv from "dotenv";
-import bcrypt from "bcrypt";
+import * as dotenv from "dotenv";
+import * as bcrypt from "bcrypt";
 
 dotenv.config();
 
@@ -27,15 +27,18 @@ const hashPassword = async function (password: String) {
 };
 
 const groupArray = function (arr: object[], quantity: number): object {
-    let chunkedArray: { [key: number]: object[] } = {}, length = arr.length, key = 1;
+    let chunkedArray: { [key: number]: object[] } = {},
+        key = 1,
+        length = arr.length,
+        track = quantity;
 
-    for (let i = 0; i < length; i += quantity) {
-        if (i + quantity >= length) quantity = length;
-        chunkedArray[key] = arr.slice(i, quantity)
+    for (let i = 0; i < length; i += track) {
+        if (i >= quantity) quantity += track;
+        chunkedArray[key] = arr.slice(i, quantity);
         key++;
     }
 
     return chunkedArray;
-}
+};
 
-export {generateNumber, reg, saltRounds, hashPassword, groupArray};
+export { generateNumber, reg, saltRounds, hashPassword, groupArray };
