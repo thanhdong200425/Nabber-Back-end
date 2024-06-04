@@ -27,6 +27,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const sequelize_1 = require("sequelize");
 // @ts-ignore
 const dotenv_1 = __importDefault(require("dotenv"));
 const User_1 = __importDefault(require("./database/models/User"));
@@ -112,11 +113,15 @@ apiPost.get("/friend-posts", async (req, res) => {
     let userId = await User_1.default.getId(email);
     if (userId === null)
         return res.status(404).json({ message: "Not found" });
+    // @ts-ignore (Get post of friends)
+    let friendList = await User_1.default.getPostOfFriends(userId.id);
     // @ts-ignore
-    let list = await User_1.default.getPostOfFriends(userId.id);
-    if (list === null)
+    let userList = await User_1.default.getAllPost(userId.id);
+    if (userList !== null)
+        friendList?.push(...userList);
+    if (friendList === null)
         return res.status(404).json({ message: "Not found" });
-    return res.status(200).json({ posts: list });
+    return res.status(200).json({ posts: friendList });
 });
 apiPost.post("/add-post", async (req, res) => {
     let email = req.body.user.email, content = req.body.content, image = req.body.image, isComplete = null;
@@ -127,6 +132,24 @@ apiPost.post("/add-post", async (req, res) => {
     // @ts-ignore
     await User_1.default.addPost(userId.id, image, content).then((result) => (isComplete = result));
     return res.status(isComplete ? 200 : 400).json({ message: isComplete });
+});
+apiPost.get("/specific-user/:id", async (req, res) => {
+    const id = req.params.id;
+    if (!id)
+        return res.status(400).json({ message: "ID is empty" });
+    const allPostForId = await Post_1.default.findAll({ where: { userId: id } });
+    let newArray = (0, helper_1.groupArray)(allPostForId, 3);
+    return res.status(200).json({ groupArray: newArray });
+});
+// Search users
+app.get("/search", IsLogin_1.default, async (req, res) => {
+    const query = req.query.query;
+    if (query === "")
+        return res.status(400).json({ message: "Error" });
+    const result = await User_1.default.findAll({ where: { username: { [sequelize_1.Op.like]: "%" + query + "%" } } });
+    if (result.length > 0)
+        return res.status(200).json({ data: result });
+    return res.status(404).json({ data: "User not found" });
 });
 app.listen(port, () => {
     console.log(`Server is running on ${port}`);

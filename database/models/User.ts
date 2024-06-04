@@ -62,7 +62,6 @@ class User extends Model {
 
     public static async getPostOfFriends(userId: number) {
         const query = 'SELECT posts.*, users."givenName", users."givenSurname", users.image as "userImage", users.country FROM posts JOIN friends ON posts."userId" = friends."targetId" JOIN users ON users.id = posts."userId" WHERE friends."sourceId"=:id';
-        console.log(userId);
         try {
             const listUser = await sequelize.query(query, {
                 replacements: { id: userId },
@@ -89,6 +88,23 @@ class User extends Model {
             console.log("Error when add post for the user:  " + error);
         }
     }
+
+    public static async getAllPost(userId: number) {
+        const query = 'SELECT posts.*, users."givenName", users."givenSurname", users.image as "userImage", users.country FROM posts JOIN users ON users.id = posts."userId" WHERE users.id =:id';
+        try {
+            const listPostOfUser = await sequelize.query(query, {
+                replacements: { id: userId },
+                type: QueryTypes.SELECT,
+            });
+
+            return listPostOfUser.length <= 0 ? null : listPostOfUser;
+        } catch (error) {
+            console.log("Error when get the list of post for current user: " + error);
+            return null;
+        }
+    }
+
+    public static async findContacts(value: String) {}
 }
 
 User.init(

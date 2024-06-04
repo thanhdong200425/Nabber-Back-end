@@ -15,7 +15,7 @@
         "seed:generate": "sequelize-cli seed:generate --name",
         "seed:all": "tsc && sequelize-cli db:seed:all",
         "seed": "tsc && sequelize-cli db:seed --seed",
-        "server": "tsc && nodemon"
+        "server": "tsc && nodemon --exec ts-node index.ts"
     },
     "author": "Thanh Dong",
     "license": "ISC",
@@ -36,7 +36,7 @@
         "@types/express": "^4.17.21",
         "@types/jsonwebtoken": "^9.0.6",
         "@types/node": "^20.12.7",
-        "nodemon": "^3.1.0",
+        "nodemon": "^3.1.1",
         "ts-node": "^10.9.2",
         "typescript": "^5.4.5"
     }
