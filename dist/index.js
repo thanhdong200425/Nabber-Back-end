@@ -106,7 +106,7 @@ apiPost.get("/", async (req, res) => {
     let allPost = await Post_1.default.findAll({ where: { userId: userId } });
     let newArray = (0, helper_1.groupArray)(allPost, 3);
     // @ts-ignore
-    return res.status(200).json({ post: allPost, groupArray: newArray });
+    return res.status(200).json({ post: allPost, groupArray: newArray, user: user });
 });
 apiPost.get("/friend-posts", async (req, res) => {
     let email = req.body.user.email;
@@ -137,9 +137,15 @@ apiPost.get("/specific-user/:id", async (req, res) => {
     const id = req.params.id;
     if (!id)
         return res.status(400).json({ message: "ID is empty" });
-    const allPostForId = await Post_1.default.findAll({ where: { userId: id } });
-    let newArray = (0, helper_1.groupArray)(allPostForId, 3);
-    return res.status(200).json({ groupArray: newArray });
+    try {
+        const user = await User_1.default.findOne({ where: { id: id } });
+        const allPostForId = await Post_1.default.findAll({ where: { userId: id } });
+        let newArray = (0, helper_1.groupArray)(allPostForId, 3);
+        return res.status(200).json({ groupArray: newArray, user: user });
+    }
+    catch (error) {
+        return res.status(500).json({ message: error });
+    }
 });
 // Search users
 app.get("/search", IsLogin_1.default, async (req, res) => {
