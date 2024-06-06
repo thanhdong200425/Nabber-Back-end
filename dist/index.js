@@ -54,7 +54,9 @@ app.post("/sign-in", async (req, res) => {
         const userInfo = await User_1.default.findOne({ where: { email: email } });
         // @ts-ignore
         res.header("loginToken", userInfo.loginToken);
-        return res.status(200).json({ data: userInfo, loginToken: res.getHeader("loginToken") });
+        return res
+            .status(200)
+            .json({ data: userInfo, loginToken: res.getHeader("loginToken") });
     }
     return res.status(400).json({ message: "User not found" });
 });
@@ -65,7 +67,9 @@ app.post("/sign-up", async (req, res) => {
         if (helper_1.reg.test(password)) {
             const hashedPassword = await (0, helper_1.hashPassword)(password);
             // @ts-ignore
-            const loginToken = jwt.sign({ email: email }, process.env.ENV_SECRET_KEY, { expiresIn: "30 days" });
+            const loginToken = jwt.sign({ email: email }, 
+            //   @ts-ignore
+            process.env.ENV_SECRET_KEY, { expiresIn: "30 days" });
             const newUser = await User_1.default.create({
                 email: email,
                 passwordHash: hashedPassword,
@@ -73,15 +77,21 @@ app.post("/sign-up", async (req, res) => {
                 loginToken: loginToken,
             });
             res.header("loginToken", loginToken);
-            const newUserReturn = await User_1.default.findOne({ where: { email: email } });
+            const newUserReturn = await User_1.default.findOne({
+                where: { email: email },
+            });
             return res.json({ message: "OK", data: newUserReturn }).status(200);
         }
         else
-            return res.status(400).json({ message: "Password must have at least 1 special character, 1 uppercase letter and 1 number" });
+            return res.status(400).json({
+                message: "Password must have at least 1 special character, 1 uppercase letter and 1 number",
+            });
     }
     catch (error) {
         if (error.message === "Error hash password")
-            return res.status(500).json({ message: "Error when hash password" });
+            return res
+                .status(500)
+                .json({ message: "Error when hash password" });
         console.log(error);
     }
 });
@@ -106,7 +116,9 @@ apiPost.get("/", async (req, res) => {
     let allPost = await Post_1.default.findAll({ where: { userId: userId } });
     let newArray = (0, helper_1.groupArray)(allPost, 3);
     // @ts-ignore
-    return res.status(200).json({ post: allPost, groupArray: newArray, user: user });
+    return res
+        .status(200)
+        .json({ post: allPost, groupArray: newArray, user: user });
 });
 apiPost.get("/friend-posts", async (req, res) => {
     let email = req.body.user.email;
@@ -152,10 +164,33 @@ app.get("/search", IsLogin_1.default, async (req, res) => {
     const query = req.query.query;
     if (query === "")
         return res.status(400).json({ message: "Error" });
-    const result = await User_1.default.findAll({ where: { username: { [sequelize_1.Op.like]: "%" + query + "%" } } });
+    const result = await User_1.default.findAll({
+        where: { username: { [sequelize_1.Op.like]: "%" + query + "%" } },
+    });
     if (result.length > 0)
         return res.status(200).json({ data: result });
     return res.status(404).json({ data: "User not found" });
+});
+// Update info of a user
+apiPost.patch("/update-user", async (req, res) => {
+    const { id, givenName, username, gender, image } = req.body;
+    try {
+        const update = await User_1.default.update({
+            givenName: givenName,
+            username: username,
+            gender: gender,
+            image: image,
+        }, { where: { id: id } });
+        if (update) {
+            const updatedUser = await User_1.default.findOne({ where: { id: id } });
+            return res.status(200).json({ user: updatedUser });
+        }
+        return res.status(400).json({ message: "User not found" });
+    }
+    catch (error) {
+        console.log("Error when update info of a user");
+        return res.status(500).json({ message: "Error in server side" });
+    }
 });
 app.listen(port, () => {
     console.log(`Server is running on ${port}`);

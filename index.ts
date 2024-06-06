@@ -1,16 +1,12 @@
-import express from "express";
-import { Op, where } from "sequelize";
-import { Request, Response } from "express";
+import express, { Request, Response } from "express";
+import { Op } from "sequelize";
 // @ts-ignore
 import dotenv from "dotenv";
 import User from "./database/models/User";
 import { groupArray, hashPassword, reg } from "./helper/helper";
-import * as os from "os";
-import IsLogin from "./middleware/IsLogin";
 import isLogin from "./middleware/IsLogin";
 import * as jwt from "jsonwebtoken";
 import Post from "./database/models/Post";
-import user from "./database/models/User";
 
 dotenv.config();
 const app = express();
@@ -34,7 +30,9 @@ app.post("/sign-in", async (req: Request, res: Response) => {
         const userInfo = await User.findOne({ where: { email: email } });
         // @ts-ignore
         res.header("loginToken", userInfo.loginToken);
-        return res.status(200).json({ data: userInfo, loginToken: res.getHeader("loginToken") });
+        return res
+            .status(200)
+            .json({ data: userInfo, loginToken: res.getHeader("loginToken") });
     }
 
     return res.status(400).json({ message: "User not found" });
@@ -47,7 +45,12 @@ app.post("/sign-up", async (req: Request, res: Response) => {
         if (reg.test(password)) {
             const hashedPassword = await hashPassword(password);
             // @ts-ignore
-            const loginToken = jwt.sign({ email: email }, process.env.ENV_SECRET_KEY, { expiresIn: "30 days" });
+            const loginToken = jwt.sign(
+                { email: email },
+                //   @ts-ignore
+                process.env.ENV_SECRET_KEY,
+                { expiresIn: "30 days" }
+            );
             const newUser = await User.create({
                 email: email,
                 passwordHash: hashedPassword,
@@ -56,11 +59,20 @@ app.post("/sign-up", async (req: Request, res: Response) => {
             });
 
             res.header("loginToken", loginToken);
-            const newUserReturn = await User.findOne({ where: { email: email } });
+            const newUserReturn = await User.findOne({
+                where: { email: email },
+            });
             return res.json({ message: "OK", data: newUserReturn }).status(200);
-        } else return res.status(400).json({ message: "Password must have at least 1 special character, 1 uppercase letter and 1 number" });
+        } else
+            return res.status(400).json({
+                message:
+                    "Password must have at least 1 special character, 1 uppercase letter and 1 number",
+            });
     } catch (error: any) {
-        if (error.message === "Error hash password") return res.status(500).json({ message: "Error when hash password" });
+        if (error.message === "Error hash password")
+            return res
+                .status(500)
+                .json({ message: "Error when hash password" });
         console.log(error);
     }
 });
@@ -87,7 +99,9 @@ apiPost.get("/", async (req: Request, res: Response) => {
     let newArray = groupArray(allPost, 3);
 
     // @ts-ignore
-    return res.status(200).json({ post: allPost, groupArray: newArray, user: user });
+    return res
+        .status(200)
+        .json({ post: allPost, groupArray: newArray, user: user });
 });
 
 apiPost.get("/friend-posts", async (req: Request, res: Response) => {
@@ -99,7 +113,8 @@ apiPost.get("/friend-posts", async (req: Request, res: Response) => {
     // @ts-ignore
     let userList = await User.getAllPost(userId.id);
     if (userList !== null) friendList?.push(...userList);
-    if (friendList === null) return res.status(404).json({ message: "Not found" });
+    if (friendList === null)
+        return res.status(404).json({ message: "Not found" });
     return res.status(200).json({ posts: friendList });
 });
 
@@ -113,7 +128,9 @@ apiPost.post("/add-post", async (req: Request, res: Response) => {
         return res.status(404).json({ message: "Authenticate is falied" });
     }
     // @ts-ignore
-    await User.addPost(userId.id, image, content).then((result) => (isComplete = result));
+    await User.addPost(userId.id, image, content).then(
+        (result) => (isComplete = result)
+    );
     return res.status(isComplete ? 200 : 400).json({ message: isComplete });
 });
 
@@ -134,9 +151,35 @@ apiPost.get("/specific-user/:id", async (req: Request, res: Response) => {
 app.get("/search", isLogin, async (req: Request, res: Response) => {
     const query = req.query.query;
     if (query === "") return res.status(400).json({ message: "Error" });
-    const result = await User.findAll({ where: { username: { [Op.like]: "%" + query + "%" } } });
+    const result = await User.findAll({
+        where: { username: { [Op.like]: "%" + query + "%" } },
+    });
     if (result.length > 0) return res.status(200).json({ data: result });
     return res.status(404).json({ data: "User not found" });
+});
+
+// Update info of a user
+apiPost.patch("/update-user", async (req: Request, res: Response) => {
+    const { id, givenName, username, gender, image } = req.body;
+    try {
+        const update = await User.update(
+            {
+                givenName: givenName,
+                username: username,
+                gender: gender,
+                image: image,
+            },
+            { where: { id: id } }
+        );
+        if (update) {
+            const updatedUser = await User.findOne({ where: { id: id } });
+            return res.status(200).json({ user: updatedUser });
+        }
+        return res.status(400).json({ message: "User not found" });
+    } catch (error) {
+        console.log("Error when update info of a user");
+        return res.status(500).json({ message: "Error in server side" });
+    }
 });
 
 app.listen(port, () => {
