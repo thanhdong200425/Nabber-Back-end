@@ -70,7 +70,7 @@ class User extends sequelize_1.Model {
         }
     }
     static async getPostOfFriends(userId) {
-        const query = 'SELECT posts.*, users."givenName", users."givenSurname", users.image as "userImage", users.country FROM posts JOIN friends ON posts."userId" = friends."targetId" JOIN users ON users.id = posts."userId" WHERE friends."sourceId"=:id';
+        const query = 'SELECT posts.*, users."givenName", users."givenSurname", users.image as "userImage", users.country, COUNT(likes.id) as "likeCount" FROM posts JOIN friends ON posts."userId" = friends."targetId" JOIN users ON users.id = posts."userId" LEFT JOIN likes ON likes."postId" = posts.id WHERE friends."sourceId"=:id GROUP BY posts.id, users."givenName", users."givenSurname", users.image, users.country';
         try {
             const listUser = await sequelize_2.default.query(query, {
                 replacements: { id: userId },
@@ -86,7 +86,11 @@ class User extends sequelize_1.Model {
         const query = 'INSERT INTO posts("userId", content, image) VALUES(:userId, :content, :image)';
         try {
             const result = await sequelize_2.default.query(query, {
-                replacements: { userId: userId, content: content, image: image },
+                replacements: {
+                    userId: userId,
+                    content: content,
+                    image: image,
+                },
                 type: sequelize_1.QueryTypes.INSERT,
             });
             // @ts-ignore
@@ -97,7 +101,7 @@ class User extends sequelize_1.Model {
         }
     }
     static async getAllPost(userId) {
-        const query = 'SELECT posts.*, users."givenName", users."givenSurname", users.image as "userImage", users.country FROM posts JOIN users ON users.id = posts."userId" WHERE users.id =:id';
+        const query = 'SELECT posts.*, users."givenName", users."givenSurname", users.image as "userImage", users.country, COUNT(likes.id) as "likeCount" FROM posts JOIN users ON users.id = posts."userId" LEFT JOIN likes ON likes."postId" = posts.id WHERE users.id =:id GROUP BY posts.id, users."givenName", users."givenSurname", users.image, users.country';
         try {
             const listPostOfUser = await sequelize_2.default.query(query, {
                 replacements: { id: userId },

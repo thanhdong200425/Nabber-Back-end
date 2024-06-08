@@ -30,9 +30,7 @@ app.post("/sign-in", async (req: Request, res: Response) => {
         const userInfo = await User.findOne({ where: { email: email } });
         // @ts-ignore
         res.header("loginToken", userInfo.loginToken);
-        return res
-            .status(200)
-            .json({ data: userInfo, loginToken: res.getHeader("loginToken") });
+        return res.status(200).json({ data: userInfo, loginToken: res.getHeader("loginToken") });
     }
 
     return res.status(400).json({ message: "User not found" });
@@ -65,14 +63,10 @@ app.post("/sign-up", async (req: Request, res: Response) => {
             return res.json({ message: "OK", data: newUserReturn }).status(200);
         } else
             return res.status(400).json({
-                message:
-                    "Password must have at least 1 special character, 1 uppercase letter and 1 number",
+                message: "Password must have at least 1 special character, 1 uppercase letter and 1 number",
             });
     } catch (error: any) {
-        if (error.message === "Error hash password")
-            return res
-                .status(500)
-                .json({ message: "Error when hash password" });
+        if (error.message === "Error hash password") return res.status(500).json({ message: "Error when hash password" });
         console.log(error);
     }
 });
@@ -95,26 +89,24 @@ apiPost.get("/", async (req: Request, res: Response) => {
     let user = await User.findOne({ where: { email: email } });
     // @ts-ignore
     let userId = user.id;
-    let allPost = await Post.findAll({ where: { userId: userId } });
+    let allPost = await User.getAllPost(userId);
+    // @ts-ignore
     let newArray = groupArray(allPost, 3);
 
     // @ts-ignore
-    return res
-        .status(200)
-        .json({ post: allPost, groupArray: newArray, user: user });
+    return res.status(200).json({ post: allPost, groupArray: newArray, user: user });
 });
 
 apiPost.get("/friend-posts", async (req: Request, res: Response) => {
     let email = req.body.user.email;
     let userId = await User.getId(email);
     if (userId === null) return res.status(404).json({ message: "Not found" });
-    // @ts-ignore (Get post of friends)
+    // @ts-ignore
     let friendList = await User.getPostOfFriends(userId.id);
     // @ts-ignore
     let userList = await User.getAllPost(userId.id);
     if (userList !== null) friendList?.push(...userList);
-    if (friendList === null)
-        return res.status(404).json({ message: "Not found" });
+    if (friendList === null) return res.status(404).json({ message: "Not found" });
     return res.status(200).json({ posts: friendList });
 });
 
@@ -128,9 +120,7 @@ apiPost.post("/add-post", async (req: Request, res: Response) => {
         return res.status(404).json({ message: "Authenticate is falied" });
     }
     // @ts-ignore
-    await User.addPost(userId.id, image, content).then(
-        (result) => (isComplete = result)
-    );
+    await User.addPost(userId.id, image, content).then((result) => (isComplete = result));
     return res.status(isComplete ? 200 : 400).json({ message: isComplete });
 });
 
@@ -139,7 +129,8 @@ apiPost.get("/specific-user/:id", async (req: Request, res: Response) => {
     if (!id) return res.status(400).json({ message: "ID is empty" });
     try {
         const user = await User.findOne({ where: { id: id } });
-        const allPostForId = await Post.findAll({ where: { userId: id } });
+        const allPostForId = await User.getAllPost(parseInt(id));
+        // @ts-ignore
         let newArray = groupArray(allPostForId, 3);
         return res.status(200).json({ groupArray: newArray, user: user });
     } catch (error) {
@@ -179,6 +170,46 @@ apiPost.patch("/update-user", async (req: Request, res: Response) => {
     } catch (error) {
         console.log("Error when update info of a user");
         return res.status(500).json({ message: "Error in server side" });
+    }
+});
+
+// Toggle one like for specific post
+apiPost.post("/toggle-like", async (req: Request, res: Response) => {
+    try {
+        const { postId, userId } = req.body;
+        const isExist = await Post.isExistLikeInSpecificPost(postId, userId);
+        let result;
+        if (isExist) result = await Post.removeALike(postId, userId);
+        else result = await Post.addALike(postId, userId);
+        let quantity = await Post.getLikeInteractions(postId);
+        return res.status(200).json({ data: quantity, isExist: isExist });
+    } catch (error) {
+        console.log("Error when increase one like for specific post: " + error);
+        return res.status(500);
+    }
+});
+
+// Check whether a user like a post or not
+apiPost.post("/check-like", async (req: Request, res: Response) => {
+    try {
+        const { postId, userId } = req.body;
+        const isExist = await Post.isExistLikeInSpecificPost(postId, userId);
+        return res.status(200).json({ isExist: isExist });
+    } catch (error) {
+        console.log("Error in check like: " + error);
+        return res.status(500);
+    }
+});
+
+// Get like quantity of a post
+apiPost.post("/get-like", async (req: Request, res: Response) => {
+    try {
+        const { postId } = req.body;
+        const quantity = await Post.getLikeInteractions(postId);
+        return res.status(200).json({ data: quantity });
+    } catch (error) {
+        console.log("Error when get like quantity of a post: " + error);
+        return res.status(500);
     }
 });
 
