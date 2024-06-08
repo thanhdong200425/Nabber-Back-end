@@ -218,6 +218,18 @@ apiPost.post("/check-like", async (req, res) => {
         return res.status(500);
     }
 });
+// Get like quantity of a post
+apiPost.post("/get-like", async (req, res) => {
+    try {
+        const { postId } = req.body;
+        const quantity = await Post_1.default.getLikeInteractions(postId);
+        return res.status(200).json({ data: quantity });
+    }
+    catch (error) {
+        console.log("Error when get like quantity of a post: " + error);
+        return res.status(500);
+    }
+});
 app.listen(port, () => {
     console.log(`Server is running on ${port}`);
 });

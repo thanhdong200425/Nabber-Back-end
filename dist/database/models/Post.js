@@ -60,7 +60,7 @@ class Post extends sequelize_2.Model {
     }
     static async getLikeInteractions(postId) {
         try {
-            const query = `SELECT COUNT(id) AS likeCount FROM likes WHERE "postId"=:postId`;
+            const query = `SELECT COUNT(id) FROM likes WHERE "postId"=:postId`;
             const result = await sequelize_1.default.query(query, {
                 replacements: {
                     postId: postId,
@@ -68,7 +68,7 @@ class Post extends sequelize_2.Model {
                 type: sequelize_2.QueryTypes.SELECT,
             });
             // @ts-ignore
-            return result[0].likecount;
+            return result[0].count;
         }
         catch (error) {
             console.log("Error in getLikeInteractions function: " + error);
