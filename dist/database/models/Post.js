@@ -74,6 +74,59 @@ class Post extends sequelize_2.Model {
             console.log("Error in getLikeInteractions function: " + error);
         }
     }
+    static async getAllComments(postId) {
+        try {
+            const query = `SELECT comments.*, users."username", users.image FROM comments JOIN users ON users.id = comments."userId" WHERE "postId"=:postId`;
+            const result = await sequelize_1.default.query(query, {
+                replacements: {
+                    postId: postId,
+                },
+                type: sequelize_2.QueryTypes.SELECT,
+            });
+            return result;
+        }
+        catch (error) {
+            console.log("Error in getAllComments function: " + error);
+            return null;
+        }
+    }
+    static async isExistComment(postId, userId) {
+        try {
+            const query = `SELECT COUNT(id) FROM comments WHERE "postId"=:postId AND "userId"=:userId`;
+            const result = await sequelize_1.default.query(query, {
+                replacements: {
+                    postId: postId,
+                    userId: userId,
+                },
+                type: sequelize_2.QueryTypes.SELECT,
+            });
+            // @ts-ignore
+            let value = parseInt(result[0].count);
+            return value > 0;
+        }
+        catch (error) {
+            console.log("Error in isExistComment function: " + error);
+            return null;
+        }
+    }
+    static async addAComment(userId, postId, content) {
+        try {
+            const query = `INSERT INTO comments("userId", "postId", "content") VALUES(:userId, :postId, :content)`;
+            const result = await sequelize_1.default.query(query, {
+                replacements: {
+                    userId: userId,
+                    postId: postId,
+                    content: content,
+                },
+                type: sequelize_2.QueryTypes.INSERT,
+            });
+            return true;
+        }
+        catch (error) {
+            console.log("Error in addAComment function: " + error);
+            return false;
+        }
+    }
 }
 Post.init({
     id: {

@@ -230,6 +230,35 @@ apiPost.post("/get-like", async (req, res) => {
         return res.status(500);
     }
 });
+// Get all the comment of a post
+apiPost.post("/get-comment", async (req, res) => {
+    try {
+        const { postId } = req.body;
+        const allTheComments = await Post_1.default.getAllComments(postId);
+        return res.status(200).json({ data: allTheComments });
+    }
+    catch (error) {
+        console.log("Error when get all the comment of a post: " + error);
+        return res.status(500);
+    }
+});
+// Add a comment to the specific post
+apiPost.post("/add-comment", async (req, res) => {
+    try {
+        const { userId, postId, content } = req.body;
+        // @ts-ignore
+        const isCompleted = await Post_1.default.addAComment(userId, postId, content);
+        console.log(isCompleted);
+        if (isCompleted)
+            return res.status(200).json({ data: true });
+        else
+            return res.status(400).json({ data: false });
+    }
+    catch (error) {
+        console.log("Error when add a comment to a post: " + error);
+        return res.status(500);
+    }
+});
 app.listen(port, () => {
     console.log(`Server is running on ${port}`);
 });

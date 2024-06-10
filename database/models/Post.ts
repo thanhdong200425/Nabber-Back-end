@@ -78,6 +78,61 @@ class Post extends Model {
             console.log("Error in getLikeInteractions function: " + error);
         }
     }
+
+    public static async getAllComments(postId: number) {
+        try {
+            const query = `SELECT comments.*, users."username", users.image FROM comments JOIN users ON users.id = comments."userId" WHERE "postId"=:postId`;
+            const result = await sequelize.query(query, {
+                replacements: {
+                    postId: postId,
+                },
+                type: QueryTypes.SELECT,
+            });
+
+            return result;
+        } catch (error) {
+            console.log("Error in getAllComments function: " + error);
+            return null;
+        }
+    }
+
+    public static async isExistComment(postId: number, userId: number) {
+        try {
+            const query = `SELECT COUNT(id) FROM comments WHERE "postId"=:postId AND "userId"=:userId`;
+            const result = await sequelize.query(query, {
+                replacements: {
+                    postId: postId,
+                    userId: userId,
+                },
+                type: QueryTypes.SELECT,
+            });
+            // @ts-ignore
+            let value = parseInt(result[0].count);
+            return value > 0;
+        } catch (error) {
+            console.log("Error in isExistComment function: " + error);
+            return null;
+        }
+    }
+
+    public static async addAComment(userId: number, postId: number, content: string) {
+        try {
+            const query = `INSERT INTO comments("userId", "postId", "content") VALUES(:userId, :postId, :content)`;
+            const result = await sequelize.query(query, {
+                replacements: {
+                    userId: userId,
+                    postId: postId,
+                    content: content,
+                },
+                type: QueryTypes.INSERT,
+            });
+
+            return true;
+        } catch (error) {
+            console.log("Error in addAComment function: " + error);
+            return false;
+        }
+    }
 }
 
 Post.init(

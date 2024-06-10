@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-import {DataTypes, QueryInterface, Sequelize} from "sequelize";
+import { DataTypes, QueryInterface, Sequelize } from "sequelize";
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -11,19 +11,19 @@ module.exports = {
          * Example:
          * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
          */
-        await queryInterface.createTable('comments', {
+        await queryInterface.createTable("comments", {
             id: {
                 primaryKey: true,
                 type: DataTypes.INTEGER,
-                autoIncrement: true
+                autoIncrement: true,
             },
             userId: {
                 allowNull: false,
-                type: DataTypes.INTEGER
+                type: DataTypes.INTEGER,
             },
             postId: {
                 allowNull: false,
-                type: DataTypes.INTEGER
+                type: DataTypes.INTEGER,
             },
             content: {
                 type: DataTypes.TEXT,
@@ -32,35 +32,35 @@ module.exports = {
             createdAt: {
                 type: DataTypes.DATE,
                 allowNull: false,
-                defaultValue: Sequelize.literal("CURRENT_TIMESTAMP")
+                defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
             },
             updatedAt: {
                 type: DataTypes.DATE,
-                allowNull: true
-            }
+                allowNull: true,
+            },
         });
 
         await queryInterface.addConstraint("comments", {
-            fields: ['userId'],
+            fields: ["userId"],
             type: "foreign key",
             references: {
                 table: "users",
-                field: "id"
+                field: "id",
             },
             onDelete: "cascade",
-            onUpdate: "cascade"
-        })
+            onUpdate: "cascade",
+        });
 
         await queryInterface.addConstraint("comments", {
-            fields: ['postId'],
+            fields: ["postId"],
             type: "foreign key",
             references: {
                 table: "posts",
-                field: "id"
+                field: "id",
             },
             onDelete: "cascade",
-            onUpdate: "cascade"
-        })
+            onUpdate: "cascade",
+        });
     },
 
     async down(queryInterface: QueryInterface, Sequelize: Sequelize) {
@@ -71,5 +71,5 @@ module.exports = {
          * await queryInterface.dropTable('users');
          */
         await queryInterface.dropTable("comments");
-    }
+    },
 };
