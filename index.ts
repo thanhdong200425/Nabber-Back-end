@@ -7,11 +7,14 @@ import { groupArray, hashPassword, reg } from "./helper/helper";
 import isLogin from "./middleware/IsLogin";
 import * as jwt from "jsonwebtoken";
 import Post from "./database/models/Post";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 dotenv.config();
 const app = express();
 const port = process.env.PORT;
 const apiPost = express.Router();
+const genAI = new GoogleGenerativeAI(process.env.AI_API_KEY as string);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 // Middleware
 app.use(express.urlencoded()); // Parse incoming urlencoded payloads
@@ -236,6 +239,35 @@ apiPost.post("/add-comment", async (req: Request, res: Response) => {
         else return res.status(400).json({ data: false });
     } catch (error) {
         console.log("Error when add a comment to a post: " + error);
+        return res.status(500);
+    }
+});
+
+apiPost.post("/get-summary-comment", async (req: Request, res: Response) => {
+    try {
+        const { postId } = req.body;
+        const allTheComments = await Post.getAllComments(postId);
+        let dataToPrompt = [];
+        // @ts-ignore
+        dataToPrompt = allTheComments
+            ?.map((comment) => {
+                return {
+                    // @ts-ignore
+                    content: comment.content,
+                    // @ts-ignore
+                    username: comment.username,
+                };
+            })
+            .map((comment) => `Content: ${comment.content}, Username: ${comment.username}`)
+            .join("\n");
+
+        const prompt = "GIVE ME A SUMMARY COMMENT BASED ON THIS: \n" + dataToPrompt;
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+        return res.status(200).json({ data: text });
+    } catch (error) {
+        console.log("Error when get summary comment: " + error);
         return res.status(500);
     }
 });

@@ -35,10 +35,13 @@ const helper_1 = require("./helper/helper");
 const IsLogin_1 = __importDefault(require("./middleware/IsLogin"));
 const jwt = __importStar(require("jsonwebtoken"));
 const Post_1 = __importDefault(require("./database/models/Post"));
+const generative_ai_1 = require("@google/generative-ai");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT;
 const apiPost = express_1.default.Router();
+const genAI = new generative_ai_1.GoogleGenerativeAI(process.env.AI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 // Middleware
 app.use(express_1.default.urlencoded()); // Parse incoming urlencoded payloads
 app.use(express_1.default.json()); // Parse incoming json payloads
@@ -256,6 +259,34 @@ apiPost.post("/add-comment", async (req, res) => {
     }
     catch (error) {
         console.log("Error when add a comment to a post: " + error);
+        return res.status(500);
+    }
+});
+apiPost.post("/get-summary-comment", async (req, res) => {
+    try {
+        const { postId } = req.body;
+        const allTheComments = await Post_1.default.getAllComments(postId);
+        let dataToPrompt = [];
+        // @ts-ignore
+        dataToPrompt = allTheComments
+            ?.map((comment) => {
+            return {
+                // @ts-ignore
+                content: comment.content,
+                // @ts-ignore
+                username: comment.username,
+            };
+        })
+            .map((comment) => `Content: ${comment.content}, Username: ${comment.username}`)
+            .join("\n");
+        const prompt = "GIVE ME A SUMMARY COMMENT BASED ON THIS: \n" + dataToPrompt;
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+        return res.status(200).json({ data: text });
+    }
+    catch (error) {
+        console.log("Error when get summary comment: " + error);
         return res.status(500);
     }
 });
