@@ -36,6 +36,7 @@ const IsLogin_1 = __importDefault(require("./middleware/IsLogin"));
 const jwt = __importStar(require("jsonwebtoken"));
 const Post_1 = __importDefault(require("./database/models/Post"));
 const generative_ai_1 = require("@google/generative-ai");
+const Notification_1 = __importDefault(require("./database/models/Notification"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT;
@@ -194,13 +195,41 @@ apiPost.patch("/update-user", async (req, res) => {
 // Toggle one like for specific post
 apiPost.post("/toggle-like", async (req, res) => {
     try {
+        console.log(req.body);
         const { postId, userId } = req.body;
         const isExist = await Post_1.default.isExistLikeInSpecificPost(postId, userId);
         let result;
         if (isExist)
             result = await Post_1.default.removeALike(postId, userId);
-        else
+        else {
             result = await Post_1.default.addALike(postId, userId);
+            const senderInfo = await User_1.default.findOne({
+                where: {
+                    id: userId,
+                },
+            });
+            const ownPostInfo = await Post_1.default.findOne({ where: { id: postId } });
+            const isExisting = await Notification_1.default.findAll({
+                where: {
+                    senderId: userId,
+                    // @ts-ignore
+                    receiverId: ownPostInfo?.userId,
+                    postId: postId,
+                },
+            });
+            if (isExisting.length === 0)
+                await Notification_1.default.create({
+                    senderId: userId,
+                    // @ts-ignore
+                    receiverId: ownPostInfo?.userId,
+                    notificationTypeId: 1,
+                    postId: postId,
+                    // @ts-ignore
+                    content: `liked your post`,
+                    // @ts-ignore
+                    imageUrl: ownPostInfo.image,
+                });
+        }
         let quantity = await Post_1.default.getLikeInteractions(postId);
         return res.status(200).json({ data: quantity, isExist: isExist });
     }
@@ -281,12 +310,45 @@ apiPost.post("/get-summary-comment", async (req, res) => {
             .join("\n");
         const prompt = "GIVE ME A SUMMARY COMMENT BASED ON THIS: \n" + dataToPrompt;
         const result = await model.generateContent(prompt);
-        const response = await result.response;
+        const response = result.response;
         const text = response.text();
         return res.status(200).json({ data: text });
     }
     catch (error) {
         console.log("Error when get summary comment: " + error);
+        return res.status(500);
+    }
+});
+// Fetch all the notifications
+apiPost.post("/get-all-notifications", async (req, res) => {
+    try {
+        const { receiverId } = req.body;
+        const result = await Notification_1.default.getAll(receiverId);
+        return res.status(200).json({ data: result });
+    }
+    catch (error) {
+        console.log("Error when fetch all the notifications: " + error);
+        return res.status(500);
+    }
+});
+// Check whether a notification is exisiting
+apiPost.post("/is-existing-notification", async (req, res) => {
+    try {
+        const { senderId, receiverId, postId } = req.body;
+        const result = await Notification_1.default.findOne({
+            where: {
+                senderId: senderId,
+                receiverId: receiverId,
+                postId: postId,
+            },
+        });
+        let returnValue = false;
+        if (result !== null)
+            returnValue = true;
+        return res.status(200).json({ data: returnValue });
+    }
+    catch (error) {
+        console.log("Error in check whether a notification is existing: " + error);
         return res.status(500);
     }
 });
