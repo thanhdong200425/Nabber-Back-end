@@ -208,7 +208,6 @@ apiPost.post("/toggle-like", async (req: Request, res: Response) => {
                     receiverId: ownPostInfo?.userId,
                     notificationTypeId: 1,
                     postId: postId,
-                    // @ts-ignore
                     content: `liked your post`,
                     // @ts-ignore
                     imageUrl: ownPostInfo.image,
@@ -264,9 +263,20 @@ apiPost.post("/add-comment", async (req: Request, res: Response) => {
         const { userId, postId, content } = req.body;
         // @ts-ignore
         const isCompleted = await Post.addAComment(userId, postId, content);
-        console.log(isCompleted);
-        if (isCompleted) return res.status(200).json({ data: true });
-        else return res.status(400).json({ data: false });
+        if (isCompleted) {
+            const ownPostInfo = await Post.findOne({ where: { id: postId } });
+            await Notification.create({
+                senderId: userId,
+                postId: postId,
+                notificationTypeId: 2,
+                content: "commented on your post",
+                // @ts-ignore
+                receiverId: ownPostInfo?.userId,
+                // @ts-ignore
+                imageUrl: ownPostInfo?.image,
+            });
+            return res.status(200).json({ data: true });
+        } else return res.status(400).json({ data: false });
     } catch (error) {
         console.log("Error when add a comment to a post: " + error);
         return res.status(500);
