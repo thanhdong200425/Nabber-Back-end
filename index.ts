@@ -32,6 +32,23 @@ app.post("/sign-in", async (req: Request, res: Response) => {
     const validUser = await User.authenticate(email, password);
     if (validUser) {
         const userInfo = await User.findOne({ where: { email: email } });
+
+        try {
+            // @ts-ignore
+            jwt.verify(userInfo.loginToken, process.env.ENV_SECRET_KEY);
+        } catch (error) {
+            // Handle when a login token is expired
+            const newLoginToken = await jwt.sign(
+                { email: email },
+                // @ts-ignore
+                process.env.ENV_SECRET_KEY,
+                { expiresIn: "30 days" }
+            );
+
+            // @ts-ignore
+            userInfo.loginToken = newLoginToken;
+            await userInfo?.save();
+        }
         // @ts-ignore
         res.header("loginToken", userInfo.loginToken);
         return res.status(200).json({ data: userInfo, loginToken: res.getHeader("loginToken") });
@@ -341,6 +358,28 @@ apiPost.post("/is-existing-notification", async (req: Request, res: Response) =>
         return res.status(200).json({ data: returnValue });
     } catch (error) {
         console.log("Error in check whether a notification is existing: " + error);
+        return res.status(500);
+    }
+});
+
+apiPost.post("/get-all-stories", async (req: Request, res: Response) => {
+    try {
+        const userId = req.body.userId;
+        const result = await User.getAllStories(userId);
+        return res.status(200).json({ data: result });
+    } catch (error) {
+        console.log("Error in getAllStories route: " + error);
+        return res.status(500);
+    }
+});
+
+apiPost.post("/update-story", async (req: Request, res: Response) => {
+    try {
+        const userId = req.body.userId;
+        const result = await User.updateStories(userId);
+        return res.status(200).json({ data: result });
+    } catch (error) {
+        console.log("Error in getAllStories route: " + error);
         return res.status(500);
     }
 });

@@ -24,8 +24,7 @@ export type user = {
 
 class User extends Model {
     public static async authenticate(email: string, password: string) {
-        const query =
-            'SELECT email, "passwordHash" FROM users WHERE email=:email';
+        const query = 'SELECT email, "passwordHash" FROM users WHERE email=:email';
         try {
             const validUser = await sequelize.query(query, {
                 replacements: { email: email },
@@ -62,8 +61,7 @@ class User extends Model {
     }
 
     public static async getPostOfFriends(userId: number) {
-        const query =
-            'SELECT posts.*, users."givenName", users."givenSurname", users.image as "userImage", users.country, COUNT(likes.id) as "likeCount" FROM posts JOIN friends ON posts."userId" = friends."targetId" JOIN users ON users.id = posts."userId" LEFT JOIN likes ON likes."postId" = posts.id WHERE friends."sourceId"=:id GROUP BY posts.id, users."givenName", users."givenSurname", users.image, users.country';
+        const query = 'SELECT posts.*, users."givenName", users."givenSurname", users.image as "userImage", users.country, COUNT(likes.id) as "likeCount" FROM posts JOIN friends ON posts."userId" = friends."targetId" JOIN users ON users.id = posts."userId" LEFT JOIN likes ON likes."postId" = posts.id WHERE friends."sourceId"=:id GROUP BY posts.id, users."givenName", users."givenSurname", users.image, users.country';
         try {
             const listUser = await sequelize.query(query, {
                 replacements: { id: userId },
@@ -76,13 +74,8 @@ class User extends Model {
         }
     }
 
-    public static async addPost(
-        userId: number,
-        image: string,
-        content: string
-    ) {
-        const query =
-            'INSERT INTO posts("userId", content, image) VALUES(:userId, :content, :image)';
+    public static async addPost(userId: number, image: string, content: string) {
+        const query = 'INSERT INTO posts("userId", content, image) VALUES(:userId, :content, :image)';
         try {
             const result = await sequelize.query(query, {
                 replacements: {
@@ -101,8 +94,7 @@ class User extends Model {
     }
 
     public static async getAllPost(userId: number) {
-        const query =
-            'SELECT posts.*, users."givenName", users."givenSurname", users.image as "userImage", users.country, COUNT(likes.id) as "likeCount" FROM posts JOIN users ON users.id = posts."userId" LEFT JOIN likes ON likes."postId" = posts.id WHERE users.id =:id GROUP BY posts.id, users."givenName", users."givenSurname", users.image, users.country';
+        const query = 'SELECT posts.*, users."givenName", users."givenSurname", users.image as "userImage", users.country, COUNT(likes.id) as "likeCount" FROM posts JOIN users ON users.id = posts."userId" LEFT JOIN likes ON likes."postId" = posts.id WHERE users.id =:id GROUP BY posts.id, users."givenName", users."givenSurname", users.image, users.country';
         try {
             const listPostOfUser = await sequelize.query(query, {
                 replacements: { id: userId },
@@ -111,14 +103,42 @@ class User extends Model {
 
             return listPostOfUser.length <= 0 ? null : listPostOfUser;
         } catch (error) {
-            console.log(
-                "Error when get the list of post for current user: " + error
-            );
+            console.log("Error when get the list of post for current user: " + error);
             return null;
         }
     }
 
-    public static async findContacts(value: String) {}
+    public static async getAllStories(userId: number) {
+        const query = `SELECT users.username, users.image as "userImage", stories.* FROM stories JOIN users ON users.id = stories."userId" WHERE stories."userId"=:userId AND stories."isExpired"=false`;
+        try {
+            const storiesList = await sequelize.query(query, {
+                replacements: {
+                    userId: userId,
+                },
+                type: QueryTypes.SELECT,
+            });
+
+            return storiesList.length <= 0 ? null : storiesList;
+        } catch (error) {
+            console.log("Error in getAllStories function: " + error);
+        }
+    }
+
+    public static async updateStories(userId: number) {
+        const query = `UPDATE stories SET "isExpired"=true WHERE "userId"=:userId`;
+        try {
+            const result = await sequelize.query(query, {
+                replacements: {
+                    userId: userId,
+                },
+                type: QueryTypes.UPDATE,
+            });
+
+            return true;
+        } catch (error) {
+            console.log("Error in updateStories function: " + error);
+        }
+    }
 }
 
 User.init(

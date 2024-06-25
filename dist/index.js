@@ -56,6 +56,19 @@ app.post("/sign-in", async (req, res) => {
     const validUser = await User_1.default.authenticate(email, password);
     if (validUser) {
         const userInfo = await User_1.default.findOne({ where: { email: email } });
+        try {
+            // @ts-ignore
+            jwt.verify(userInfo.loginToken, process.env.ENV_SECRET_KEY);
+        }
+        catch (error) {
+            // Handle when a login token is expired
+            const newLoginToken = await jwt.sign({ email: email }, 
+            // @ts-ignore
+            process.env.ENV_SECRET_KEY, { expiresIn: "30 days" });
+            // @ts-ignore
+            userInfo.loginToken = newLoginToken;
+            await userInfo?.save();
+        }
         // @ts-ignore
         res.header("loginToken", userInfo.loginToken);
         return res.status(200).json({ data: userInfo, loginToken: res.getHeader("loginToken") });
@@ -224,7 +237,6 @@ apiPost.post("/toggle-like", async (req, res) => {
                     receiverId: ownPostInfo?.userId,
                     notificationTypeId: 1,
                     postId: postId,
-                    // @ts-ignore
                     content: `liked your post`,
                     // @ts-ignore
                     imageUrl: ownPostInfo.image,
@@ -280,9 +292,20 @@ apiPost.post("/add-comment", async (req, res) => {
         const { userId, postId, content } = req.body;
         // @ts-ignore
         const isCompleted = await Post_1.default.addAComment(userId, postId, content);
-        console.log(isCompleted);
-        if (isCompleted)
+        if (isCompleted) {
+            const ownPostInfo = await Post_1.default.findOne({ where: { id: postId } });
+            await Notification_1.default.create({
+                senderId: userId,
+                postId: postId,
+                notificationTypeId: 2,
+                content: "commented on your post",
+                // @ts-ignore
+                receiverId: ownPostInfo?.userId,
+                // @ts-ignore
+                imageUrl: ownPostInfo?.image,
+            });
             return res.status(200).json({ data: true });
+        }
         else
             return res.status(400).json({ data: false });
     }
@@ -349,6 +372,28 @@ apiPost.post("/is-existing-notification", async (req, res) => {
     }
     catch (error) {
         console.log("Error in check whether a notification is existing: " + error);
+        return res.status(500);
+    }
+});
+apiPost.post("/get-all-stories", async (req, res) => {
+    try {
+        const userId = req.body.userId;
+        const result = await User_1.default.getAllStories(userId);
+        return res.status(200).json({ data: result });
+    }
+    catch (error) {
+        console.log("Error in getAllStories route: " + error);
+        return res.status(500);
+    }
+});
+apiPost.post("/update-story", async (req, res) => {
+    try {
+        const userId = req.body.userId;
+        const result = await User_1.default.updateStories(userId);
+        return res.status(200).json({ data: result });
+    }
+    catch (error) {
+        console.log("Error in getAllStories route: " + error);
         return res.status(500);
     }
 });

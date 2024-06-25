@@ -114,7 +114,36 @@ class User extends sequelize_1.Model {
             return null;
         }
     }
-    static async findContacts(value) { }
+    static async getAllStories(userId) {
+        const query = `SELECT users.username, users.image as "userImage", stories.* FROM stories JOIN users ON users.id = stories."userId" WHERE stories."userId"=:userId AND stories."isExpired"=false`;
+        try {
+            const storiesList = await sequelize_2.default.query(query, {
+                replacements: {
+                    userId: userId,
+                },
+                type: sequelize_1.QueryTypes.SELECT,
+            });
+            return storiesList.length <= 0 ? null : storiesList;
+        }
+        catch (error) {
+            console.log("Error in getAllStories function: " + error);
+        }
+    }
+    static async updateStories(userId) {
+        const query = `UPDATE stories SET "isExpired"=true WHERE "userId"=:userId`;
+        try {
+            const result = await sequelize_2.default.query(query, {
+                replacements: {
+                    userId: userId,
+                },
+                type: sequelize_1.QueryTypes.UPDATE,
+            });
+            return true;
+        }
+        catch (error) {
+            console.log("Error in updateStories function: " + error);
+        }
+    }
 }
 User.init({
     id: {
